@@ -5,18 +5,19 @@ import { Chip, Grid2, Button, Stack } from "@mui/material";
 
 const Download = () => {
 	const [values, setValues] = useState<number[]>([]);
+	const [times, setTimes] = useState<number[]>([]);
 
 	const { getSensorsData } = useFirebase();
 
 	const [selectedChip, setSelectedChip] = useState("air_heat_index_c");
-	const chipLabels = ["air_heat_index_c", "air_humidity", "air_quality", "air_temp_c", "water_ds", "water_tds"];
+	const chipLabels = ["air_heat_index_c", "air_humidity_rh", "air_quality_ppm", "air_temp_c", "water_ds_c", "water_tds_ppm", "wind_speed"];
 	const handleChipClick = (label: string) => {
 		setSelectedChip(label);
 	};
 
 	const downloadCSV = () => {
-		const cols = "Values\n" + values.join("\n");
-		const csvContent = cols;
+		const unit = selectedChip.slice(selectedChip.lastIndexOf("_") + 1).toUpperCase();
+		const csvContent = `Timestamp,Values (${unit})\n` + times.map((time, index) => `${time},${values[index]}`).join("\n");
 		const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
 		const url = URL.createObjectURL(blob);
 		const link = document.createElement("a");
@@ -31,11 +32,17 @@ const Download = () => {
 		const fetchData = async () => {
 			const data = await getSensorsData();
 			if (data) {
-				let arr: number[] = [];
+				let values: number[] = [];
 				data[0][selectedChip].map((ele: any) => {
-					arr.push(ele["value"]);
+					values.push(ele["value"]);
 				});
-				setValues(arr);
+				setValues(values);
+
+				let times: number[] = [];
+				data[0][selectedChip].map((ele: any) => {
+					times.push(ele["time"]);
+				});
+				setTimes(times);
 			}
 		};
 		fetchData();

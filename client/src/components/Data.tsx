@@ -9,7 +9,7 @@ const Data = () => {
 	const [values, setValues] = useState<number[]>([]);
 	const { getSensorsData } = useFirebase();
 	const [selectedChip, setSelectedChip] = useState("air_heat_index_c");
-	const chipLabels = ["air_heat_index_c", "air_humidity", "air_quality", "air_temp_c", "water_ds", "water_tds"];
+	const chipLabels = ["air_heat_index_c", "air_humidity_rh", "air_quality_ppm", "air_temp_c", "water_ds_c", "water_tds_ppm", "wind_speed"];
 	const handleChipClick = (label: string) => {
 		setSelectedChip(label);
 	};

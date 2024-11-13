@@ -9,16 +9,17 @@
 #include <ArduinoHttpClient.h>
 #include <ArduinoJson.h>
 
-#define DHT_PIN 8
+#define DHT_PIN 7
 #define MQ_PIN A0
 #define TDS_PIN A1
 #define DS_PIN A3
+#define FAN_PIN A5
 #define cycle 5000
 
 // ********* WIFI ********* //
-  const char* ssid = "TP-LINK_5E6C";
-  const char* password = "1234567890";
-  const char* serverAddress = "192.168.0.102";
+  const char* ssid = "Yazeed alsuboh";
+  const char* password = "javascript";
+  const char* serverAddress = "172.20.10.12";
   const int serverPort = 4000;
 
   WiFiClient wifi;
@@ -49,6 +50,13 @@
   OneWire oneWire(DS_PIN);
   DallasTemperature sensors(&oneWire);
 // ********* DS ********* //
+
+// ********* FAN ********* //
+  const float maxVoltage = 5.0; 
+  const float turbineMaxVoltage = 7.2; 
+  const float maxWindSpeed = 15; 
+  const float normalizationFactor = 10;
+// ********* FAN ********* //
 
 StaticJsonDocument<200> payload;
 int loopsTillPost = 4;
@@ -105,8 +113,7 @@ void loop() {
   // ********* DHT22 ********* //
     float h = dht.readHumidity();
     float t = dht.readTemperature();
-
-    data["air_humidity"] = h; //$$_rh
+    data["air_humidity_rh"] = h;
     data["air_temp_c"] = t;
     data["air_heat_index_c"] = dht.computeHeatIndex(t, h, false);
   // ********* DHT22 ********* //
@@ -114,7 +121,7 @@ void loop() {
   // ********* MQ 135 ********* //
     MQ135.update();
     float ppm = MQ135.readSensor();
-    data["air_quality"] = ppm; //$$_ppm
+    data["air_quality_ppm"] = ppm; 
   // ********* MQ 135 ********* //
   
   // ********* TDS ********* //
@@ -123,15 +130,27 @@ void loop() {
     float tds = (voltage - CALIBRATION_FACTOR) * CONVERSION_FACTOR; 
     tds = max(tds, 0);
     
-    data["water_tds"] = tds;
+    data["water_tds_ppm"] = tds;
   // ********* TDS ********* //
 
   // ********* DS ********* //
     sensors.requestTemperatures();
     float tempC = sensors.getTempCByIndex(0); 
     
-    data["water_ds"] = tempC; //$$c
+    data["water_ds_c"] = tempC; 
   // ********* DS ********* //
+
+  // ********* FAN ********* //
+    int fan_value = analogRead(FAN_PIN); 
+    
+    if (fan_value < normalizationFactor) fan_value = 0;
+
+    float fan_voltage = (fan_value / 1023.0) * maxVoltage; 
+    float windSpeed = (fan_voltage / turbineMaxVoltage) * maxWindSpeed;
+
+
+    data["wind_speed"] = windSpeed;
+  // ********* FAN ********* //
 
   // ********* WIFI ********* //
     payload["payload"].as<JsonArray>().add(data);
