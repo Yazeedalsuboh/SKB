@@ -1,11 +1,7 @@
 import { Container, Divider, Typography } from "@mui/material";
-
 import Header from "./components/Header";
-
 import Body from "./components/Body";
-
 import Diagram from "./components/Diagram";
-
 import Data from "./components/Data";
 import Download from "./components/Download";
 

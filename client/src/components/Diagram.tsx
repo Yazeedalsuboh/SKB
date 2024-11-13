@@ -1,4 +1,5 @@
 import { Stack } from "@mui/material";
+
 const Diagram = () => {
 	return (
 		<Stack spacing={2} sx={{ alignItems: "center" }}>

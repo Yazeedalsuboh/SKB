@@ -49,7 +49,7 @@ const Data = () => {
 		responsive: true,
 		scales: {
 			x: { title: { display: true, text: "Time" } },
-			y: { title: { display: true, text: selectedChip.slice(selectedChip.lastIndexOf("_") + 1).toUpperCase() } },
+			y: { title: { display: true, text: selectedChip !== "wind_speed" ? selectedChip.slice(selectedChip.lastIndexOf("_") + 1).toUpperCase() : "m/s" } },
 		},
 	};
 
