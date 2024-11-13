@@ -14,7 +14,7 @@
 #define TDS_PIN A1
 #define DS_PIN A3
 #define FAN_PIN A5
-#define cycle 5000
+#define cycle 1000
 
 // ********* WIFI ********* //
   const char* ssid = "Yazeed alsuboh";
@@ -59,7 +59,9 @@
 // ********* FAN ********* //
 
 StaticJsonDocument<200> payload;
-int loopsTillPost = 4;
+StaticJsonDocument<200> data;
+int loopsTillSensors = 20;
+float ArrWindSpeed[5];
 
 void setup() {
   Serial.begin(9600);
@@ -105,40 +107,42 @@ void setup() {
 
 
 void loop() {
-  StaticJsonDocument<200> data;
 
-  long randomId = random(100000, 999999);
-  data["id"] = randomId;
+  if (loopsTillSensors % 5 == 0) {
+    data = {};
+    long randomId = random(100000, 999999);
+    data["id"] = randomId;
 
-  // ********* DHT22 ********* //
-    float h = dht.readHumidity();
-    float t = dht.readTemperature();
-    data["air_humidity_rh"] = h;
-    data["air_temp_c"] = t;
-    data["air_heat_index_c"] = dht.computeHeatIndex(t, h, false);
-  // ********* DHT22 ********* //
-  
-  // ********* MQ 135 ********* //
-    MQ135.update();
-    float ppm = MQ135.readSensor();
-    data["air_quality_ppm"] = ppm; 
-  // ********* MQ 135 ********* //
-  
-  // ********* TDS ********* //
-    int sensorValue = analogRead(TDS_PIN); 
-    float voltage = (sensorValue / 1024.0) * VREF; 
-    float tds = (voltage - CALIBRATION_FACTOR) * CONVERSION_FACTOR; 
-    tds = max(tds, 0);
+    // ********* DHT22 ********* //
+      float h = dht.readHumidity();
+      float t = dht.readTemperature();
+      data["air_humidity_rh"] = h;
+      data["air_temp_c"] = t;
+      data["air_heat_index_c"] = dht.computeHeatIndex(t, h, false);
+    // ********* DHT22 ********* //
     
-    data["water_tds_ppm"] = tds;
-  // ********* TDS ********* //
-
-  // ********* DS ********* //
-    sensors.requestTemperatures();
-    float tempC = sensors.getTempCByIndex(0); 
+    // ********* MQ 135 ********* //
+      MQ135.update();
+      float ppm = MQ135.readSensor();
+      data["air_quality_ppm"] = ppm; 
+    // ********* MQ 135 ********* //
     
-    data["water_ds_c"] = tempC; 
-  // ********* DS ********* //
+    // ********* TDS ********* //
+      int sensorValue = analogRead(TDS_PIN); 
+      float voltage = (sensorValue / 1024.0) * VREF; 
+      float tds = (voltage - CALIBRATION_FACTOR) * CONVERSION_FACTOR; 
+      tds = max(tds, 0);
+      
+      data["water_tds_ppm"] = tds;
+    // ********* TDS ********* //
+
+    // ********* DS ********* //
+      sensors.requestTemperatures();
+      float tempC = sensors.getTempCByIndex(0); 
+      
+      data["water_ds_c"] = tempC; 
+    // ********* DS ********* //
+  }
 
   // ********* FAN ********* //
     int fan_value = analogRead(FAN_PIN); 
@@ -148,13 +152,23 @@ void loop() {
     float fan_voltage = (fan_value / 1023.0) * maxVoltage; 
     float windSpeed = (fan_voltage / turbineMaxVoltage) * maxWindSpeed;
 
+    ArrWindSpeed[loopsTillSensors % 5] = windSpeed;
 
-    data["wind_speed"] = windSpeed;
+    
   // ********* FAN ********* //
 
   // ********* WIFI ********* //
-    payload["payload"].as<JsonArray>().add(data);
-    if (!loopsTillPost) {
+    if (loopsTillSensors % 5 == 0) {
+      
+      float windSpeedAverage = 0;
+      for (int i = 0; i < 5; i++) windSpeedAverage += ArrWindSpeed[i];
+      data["wind_speed"] = windSpeedAverage;
+
+      payload["payload"].as<JsonArray>().add(data);
+
+    }
+
+    if (!loopsTillSensors) {
       String postData;
       serializeJson(payload, postData);
       
@@ -177,15 +191,15 @@ void loop() {
       payload.clear();
       payload["payload"] = payload.createNestedArray("payload");
       data.clear();
-      loopsTillPost = 4;
+      loopsTillSensors = 20;
 
-      Serial.print("data sent loopsTillPost:");
-      Serial.println(loopsTillPost);
+      Serial.print("data sent loopsTillSensors:");
+      Serial.println(loopsTillSensors);
     
     } else {
-      Serial.print("data saved loopsTillPost:");
-      Serial.println(loopsTillPost);
-      loopsTillPost -= 1;
+      Serial.print("data saved loopsTillSensors:");
+      Serial.println(loopsTillSensors);
+      loopsTillSensors -= 1;
 
     }
 

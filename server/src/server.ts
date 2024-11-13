@@ -12,7 +12,7 @@ app.get('/', (req: Request, res: Response, next: NextFunction) => {
 
 app.post('/', (req: Request, res: Response, next: NextFunction) => {
 	const { payload } = req.body;
-	console.log('here');
+	console.log('Reading');
 	console.log(payload);
 	firebaseApp.uploadProcessedData(payload);
 	res.send('data upload route');
