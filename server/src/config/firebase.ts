@@ -49,49 +49,49 @@ const uploadProcessedData = async (payload: any) => {
 					...payload.map((ele: any) => ({
 						id: ele['id'],
 						value: ele['air_humidity_rh'],
-						time: `${year}-${month}-${day} ${hours}-${minutes}-${seconds}`
+						log_time: `${year}-${month}-${day} ${hours}-${minutes}-${seconds}`
 					}))
 				),
 				air_temp_c: arrayUnion(
 					...payload.map((ele: any) => ({
 						id: ele['id'],
 						value: ele['air_temp_c'],
-						time: `${year}-${month}-${day} ${hours}-${minutes}-${seconds}`
+						log_time: `${year}-${month}-${day} ${hours}-${minutes}-${seconds}`
 					}))
 				),
 				air_heat_index_c: arrayUnion(
 					...payload.map((ele: any) => ({
 						id: ele['id'],
 						value: ele['air_heat_index_c'],
-						time: `${year}-${month}-${day} ${hours}-${minutes}-${seconds}`
+						log_time: `${year}-${month}-${day} ${hours}-${minutes}-${seconds}`
 					}))
 				),
 				air_quality_ppm: arrayUnion(
 					...payload.map((ele: any) => ({
 						id: ele['id'],
 						value: ele['air_quality_ppm'],
-						time: `${year}-${month}-${day} ${hours}-${minutes}-${seconds}`
+						log_time: `${year}-${month}-${day} ${hours}-${minutes}-${seconds}`
 					}))
 				),
 				water_tds_ppm: arrayUnion(
 					...payload.map((ele: any) => ({
 						id: ele['id'],
 						value: ele['water_tds_ppm'],
-						time: `${year}-${month}-${day} ${hours}-${minutes}-${seconds}`
+						log_time: `${year}-${month}-${day} ${hours}-${minutes}-${seconds}`
 					}))
 				),
 				water_ds_c: arrayUnion(
 					...payload.map((ele: any) => ({
 						id: ele['id'],
 						value: ele['water_ds_c'],
-						time: `${year}-${month}-${day} ${hours}-${minutes}-${seconds}`
+						log_time: `${year}-${month}-${day} ${hours}-${minutes}-${seconds}`
 					}))
 				),
 				wind_speed: arrayUnion(
 					...payload.map((ele: any) => ({
 						id: ele['id'],
 						value: ele['wind_speed'],
-						time: `${year}-${month}-${day} ${hours}-${minutes}-${seconds}`
+						log_time: `${year}-${month}-${day} ${hours}-${minutes}-${seconds}`
 					}))
 				)
 			},

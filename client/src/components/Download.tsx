@@ -42,7 +42,7 @@ const Download = () => {
 
 				let times: number[] = [];
 				data[0][selectedChip].map((ele: any) => {
-					times.push(ele["time"]);
+					times.push(ele["log_time"]);
 				});
 				setTimes(times);
 			}
